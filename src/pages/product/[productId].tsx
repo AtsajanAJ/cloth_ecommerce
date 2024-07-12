@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Product } from "@/types/product.type";
 import productService from "@/services/product.service";
 import Image from "next/image";
+import { useSession } from 'next-auth/react';
 
 type ProductDetailPageProps = {
   product: Product;
@@ -13,6 +14,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
+  const session = useSession()
+  const email = session.data?.user?.email||"" 
+    // console.log(email);
+  const selleremail = product.seller.email
+    // console.log(selleremail);
   return (
     <MainLayout>
       <div className="px-40 py-8 w-full">
@@ -37,9 +43,9 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
             </ol>
           </nav>
           <a href="" className='relative inline-flex items-center tap-highlight-transparent outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 text-medium text-primary no-underline hover:opacity-80 active:opacity-disabled transition-opacity'>
-            <button className='z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap font-normal subpixel-antialiased overflow-hidden tap-highlight-transparent data-[pressed=true]:scale-[0.97] outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 px-4 min-w-20 h-10 text-small gap-2 rounded-medium [&amp;>svg]:max-w-[theme(spacing.8)] transition-transform-colors-opacity motion-reduce:transition-none bg-default text-default-foreground data-[hover=true]:opacity-hover'>
+            { email === selleremail && <button className='z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap font-normal subpixel-antialiased overflow-hidden tap-highlight-transparent data-[pressed=true]:scale-[0.97] outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 px-4 min-w-20 h-10 text-small gap-2 rounded-medium [&amp;>svg]:max-w-[theme(spacing.8)] transition-transform-colors-opacity motion-reduce:transition-none bg-default text-default-foreground data-[hover=true]:opacity-hover'>
               Edit
-            </button>
+            </button>}
           </a>
         </div>
         <div className="my-4">
