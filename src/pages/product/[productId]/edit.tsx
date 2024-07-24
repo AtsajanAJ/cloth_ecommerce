@@ -24,236 +24,127 @@ const EditProductPage: React.FC<EditProductPageProps> = ({ product }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm({
-      ...form,
+    setForm(prevForm => ({
+      ...prevForm,
       [name]: value,
-    });
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await productService.updateProduct(product.id, form);
-    router.push(`/product/${product.id}`);
+    try {
+      await productService.updateProduct(product.id, form);
+      router.push(`/product/${product.id}`);
+    } catch (error) {
+      console.error('Error updating product:', error);
+      // Handle error state or notification to user
+    }
   };
 
   return (
     <MainLayout>
       <div className='px-40 py-8'>
-        <nav data-slot="base" className="font-bold text-lg py-2 mb-2" aria-label="Breadcrumbs">
-          <ol data-slot="list" className="flex flex-wrap list-none rounded-small">
-            <li data-slot="base" className="flex items-center">
-              <span data-slot="item" className="flex gap-1 items-center cursor-pointer whitespace-nowrap line-clamp-1 tap-highlight-transparent outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 text-foreground/50 text-medium hover:opacity-80 active:opacity-disabled transition-opacity no-underline" tabIndex={0} role="link">
-                <a className="text-gray-400" href="/">All cloths</a>
-              </span>
-              <span data-slot="separator" aria-hidden="true" className="px-1 text-foreground/50">
-                <svg aria-hidden="true" fill="none" focusable="false" height="1em" role="presentation" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="1em">
+        <nav className="font-bold text-lg py-2 mb-2" aria-label="Breadcrumbs">
+          <ol className="flex flex-wrap list-none rounded-small">
+            <li className="flex items-center">
+              <a className="text-gray-400 hover:opacity-80 transition-opacity no-underline" href="/">Products</a>
+              <span aria-hidden="true" className="px-1 text-foreground/50">
+                <svg aria-hidden="true" fill="none" height="1em" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="1em">
                   <path d="m9 18 6-6-6-6"></path>
                 </svg>
               </span>
             </li>
-            <li data-slot="base" className="flex items-center">
-              <span data-slot="item" className="flex gap-1 items-center cursor-pointer whitespace-nowrap line-clamp-1 tap-highlight-transparent outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 text-foreground/50 text-medium hover:opacity-80 active:opacity-disabled transition-opacity no-underline" tabIndex={0} role="link">
-                <a className="text-gray-400" href={`/product/${product.id}`}>{product.name}</a>
-              </span>
-              <span data-slot="separator" aria-hidden="true" className="px-1 text-foreground/50">
-                <svg aria-hidden="true" fill="none" focusable="false" height="1em" role="presentation" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="1em">
+            <li className="flex items-center">
+              <a className="text-gray-400 hover:opacity-80 transition-opacity no-underline" href="/">{product.name}</a>
+              <span aria-hidden="true" className="px-1 text-foreground/50">
+                <svg aria-hidden="true" fill="none" height="1em" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="1em">
                   <path d="m9 18 6-6-6-6"></path>
                 </svg>
               </span>
             </li>
-            <li data-slot="base" className="flex items-center">
-              <span data-slot="item" data-current="true" className="flex gap-1 items-center whitespace-nowrap line-clamp-1 tap-highlight-transparent outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 text-medium no-underline cursor-default transition-opacity text-foreground" aria-disabled="true" role="link" aria-current="page">
-                Edit
-              </span>
+            <li className="flex items-center">
+              <span className="text-foreground cursor-default transition-opacity" aria-disabled="true" aria-current="page">Edit</span>
             </li>
           </ol>
         </nav>
-
-        <div className="px-40 py-8 w-full">
-          <h1 className="text-2xl font-bold mb-4">Edit Product</h1>
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-2 gap-6">
+        <div className="my-4">
+          <hr className="shrink-0 bg-divider border-none w-full h-divider" role='separator' />
+        </div>
+        <div className='flex space-x-2'>
+          <div className="w-[40%]">
+            <div className="flex flex-col items-start pb-2 space-y-4">
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">Image</label>
-                <img src={product.imageUrl} alt="Product Image" className="w-full h-auto" />
+                <p className="text-sm mb-2">Image</p>
+                <div className="relative">
+                  <label>
+                    <div className="cursor-pointer">
+                      <div className="flex items-center justify-center border border-dashed hover:border-primary min-w-12 max-w-52 aspect-square transition-all">
+                        <div className="p-2">
+                          <img src={product.imageUrl} alt="preview-upload" className="w-full"/>
+                        </div>
+                      </div>
+                    </div>
+                    <input type="file" hidden accept="image/*"/>
+                  </label>
+                </div>
               </div>
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                  Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  value={form.name}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
-                  Category
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  value={form.category}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                >
-                  <option value="">Select a category</option>
-                  {/* Add category options here */}
-                </select>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
-                  Price
-                </label>
-                <input
-                  id="price"
-                  name="price"
-                  type="number"
-                  value={form.price}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Select colors
-                </label>
-                <div className="flex flex-wrap">
-                  {/* Replace with dynamic color options if available */}
-                  <label className="flex items-center mr-4">
-                    <input
-                      type="checkbox"
-                      name="color"
-                      value="Black"
-                      checked={form.color?.includes("Black") ?? false}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setForm((prevForm) => {
-                          const color = prevForm.color ?? [];
-                          if (color.includes(value)) {
-                            return {
-                              ...prevForm,
-                              color: color.filter((c) => c !== value),
-                            };
-                          } else {
-                            return {
-                              ...prevForm,
-                              color: [...color, value],
-                            };
-                          }
-                        });
-                      }}
-                      className="mr-2"
-                    />
-                    Black
-                  </label>
-                  <label className="flex items-center mr-4">
-                    <input
-                      type="checkbox"
-                      name="color"
-                      value="White"
-                      checked={form.color?.includes("White") ?? false}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setForm((prevForm) => {
-                          const color = prevForm.color ?? [];
-                          if (color.includes(value)) {
-                            return {
-                              ...prevForm,
-                              color: color.filter((c) => c !== value),
-                            };
-                          } else {
-                            return {
-                              ...prevForm,
-                              color: [...color, value],
-                            };
-                          }
-                        });
-                      }}
-                      className="mr-2"
-                    />
-                    White
-                  </label>
-                  {/* Add other colors here */}
-                </div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Select sizes
-                </label>
-                <div className="flex flex-wrap">
-                  {/* Replace with dynamic size options if available */}
-                  <label className="flex items-center mr-4">
-                    <input
-                      type="checkbox"
-                      name="sizes"
-                      value="S"
-                      checked={form.sizes?.includes("S") ?? false}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setForm((prevForm) => {
-                          const sizes = prevForm.sizes ?? [];
-                          if (sizes.includes(value)) {
-                            return {
-                              ...prevForm,
-                              sizes: sizes.filter((s) => s !== value),
-                            };
-                          } else {
-                            return {
-                              ...prevForm,
-                              sizes: [...sizes, value],
-                            };
-                          }
-                        });
-                      }}
-                      className="mr-2"
-                    />
-                    S
-                  </label>
-                  <label className="flex items-center mr-4">
-                    <input
-                      type="checkbox"
-                      name="sizes"
-                      value="M"
-                      checked={form.sizes?.includes("M") ?? false}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setForm((prevForm) => {
-                          const sizes = prevForm.sizes ?? [];
-                          if (sizes.includes(value)) {
-                            return {
-                              ...prevForm,
-                              sizes: sizes.filter((s) => s !== value),
-                            };
-                          } else {
-                            return {
-                              ...prevForm,
-                              sizes: [...sizes, value],
-                            };
-                          }
-                        });
-                      }}
-                      className="mr-2"
-                    />
-                    M
-                  </label>
-                  {/* Add other sizes here */}
+                <p className="text-sm mb-2">Gallery</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="relative">
+                    <label>
+                      <div className="cursor-pointer">
+                        <div className="flex items-center justify-center border border-dashed hover:border-primary min-w-12 max-w-52 aspect-square transition-all">
+                          <div className="p-2">
+                            <p className="text-sm text-gray-400">Select images</p>
+                          </div>
+                        </div>
+                      </div>
+                      <input type="file" hidden accept="image/*" multiple/>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Update
-            </button>
-          </form>
+          </div>
+          <div className='w-[60%]'>
+            <form onSubmit={handleSubmit}>
+              <div className='flex flex-col items-center pb-2 space-y-4'>
+                <div className="group w-full">
+                  <label htmlFor="name" className="text-sm mb-2">Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    placeholder="Product name"
+                  />
+                </div>
+                <div className="group w-full">
+                  <label htmlFor="description" className="text-sm mb-2">Description</label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={form.description}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    placeholder="Product description"
+                    rows={5}
+                  />
+                </div>
+                {/* Additional form fields */}
+                <div className=''>
+                  {/* Additional form fields */}
+                </div>
+                <div className=''>
+                  {/* Additional form fields */}
+                </div>
+                <button type="submit" className="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors">Submit</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </MainLayout>
@@ -262,13 +153,19 @@ const EditProductPage: React.FC<EditProductPageProps> = ({ product }) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { productId } = context.params as { productId: string };
-  const product = await productService.fetchProduct(productId);
-
-  return {
-    props: {
-      product,
-    },
-  };
+  try {
+    const product = await productService.fetchProduct(productId);
+    return {
+      props: {
+        product,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return {
+      notFound: true, // or handle error state appropriately
+    };
+  }
 };
 
 export default EditProductPage;
